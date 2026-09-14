@@ -298,7 +298,7 @@ function showStackedView() {
 
     setTimeout(function () {
         gridView.style.display    = 'none';
-        stackedView.style.display = 'grid';
+        stackedView.style.display = 'flex';
         stackedView.style.opacity = '0';
         stackedView.style.transform = 'translateY(10px)';
 
