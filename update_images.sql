@@ -1,22 +1,24 @@
 -- ============================================================
 --  UPDATE GAMBAR PRODUK
---  Jalankan di phpMyAdmin setelah gambar disalin ke folder img/
+--  Jalankan di phpMyAdmin / MySQL CLI setelah gambar disalin ke folder img/
 -- ============================================================
 
 USE `ecommerce`;
 
--- Gambar yang sudah tersedia
-UPDATE product SET product_image = 'samsung-galaxy-a54.jpg'   WHERE product_title = 'Samsung Galaxy A54';
-UPDATE product SET product_image = 'iphone-14-pro.jpg'        WHERE product_title LIKE '%iPhone 14 Pro%';
-UPDATE product SET product_image = 'kemeja-pria-slim-fit.jpg'  WHERE product_title LIKE '%Kemeja Pria Slim Fit%';
+-- Gadget & Elektronik
+UPDATE product SET product_image = 'HP-Spectre-x360.jpg'          WHERE product_title LIKE '%HP Spectre%';
+UPDATE product SET product_image = 'iPhone_12_Pro.jpg'           WHERE product_title LIKE '%iPhone 12 Pro%';
+UPDATE product SET product_image = 'iphone-14-pro.jpg'           WHERE product_title LIKE '%iPhone 14 Pro%';
+UPDATE product SET product_image = 'iPhone-15-Pro.jpg'           WHERE product_title LIKE '%iPhone 15 Pro%';
+UPDATE product SET product_image = 'Samsung-Galaxy-S23-Ultra.jpg' WHERE product_title LIKE '%Samsung Galaxy S23 Ultra%' OR product_title LIKE '%Samsung%S23%';
+UPDATE product SET product_image = 'Samsung_Galaxy_S21.jpg'       WHERE product_title LIKE '%Samsung Galaxy S21%' OR product_title LIKE '%Samsung%S21%';
+UPDATE product SET product_image = 'samsung-galaxy-a54.jpg'      WHERE product_title LIKE '%Samsung Galaxy A54%';
+UPDATE product SET product_image = 'ASUS-ROG-Phone-7.jpg'        WHERE product_title LIKE '%ASUS ROG%';
+UPDATE product SET product_image = 'Apple-MacBook-Air-M2.webp'   WHERE product_title LIKE '%MacBook Air%';
 
--- Sisa produk (gambar akan ditambahkan setelah kuota generate gambar reset ~5 jam lagi)
--- Samsung Smart TV 43"
--- Sepatu Nike Air Max
--- Dress Wanita Casual
--- Celana Adidas Training
--- Set Meja Belajar IKEA
--- Buku Pemrograman PHP
--- Jaket Hoodie Pria
--- Sepatu Adidas Stan Smith
--- Rak Piring IKEA
+-- Fashion & Sport
+UPDATE product SET product_image = 'kemeja-pria-slim-fit.jpg'     WHERE product_title LIKE '%Kemeja Pria Slim Fit%' OR product_title LIKE '%Mens Casual Shirt%';
+UPDATE product SET product_image = 'Kemeja-Wanita-Oxford-Uniqlo.jpg' WHERE product_title LIKE '%Kemeja Wanita Oxford%';
+UPDATE product SET product_image = 'Tunik-Batik-Modern.jpg'       WHERE product_title LIKE '%Tunik Batik%';
+UPDATE product SET product_image = 'Celana-Jogger-Training-Adidas.avif' WHERE product_title LIKE '%Jogger Training Adidas%';
+
