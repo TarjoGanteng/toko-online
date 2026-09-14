@@ -176,39 +176,36 @@ window.addEventListener('scroll', function () {
     window.reObserveFadeIn = observeAll;
 })();
 
+// ---- Helper to highlight active nav button ----
+function updateCategoryNavActive(catId) {
+    document.querySelectorAll('.categoryhome').forEach(function (l) {
+        var cid = l.getAttribute('cid') || '0';
+        if (String(cid) === String(catId)) {
+            l.style.background = 'var(--bg-dark)';
+            l.style.color = '#fff';
+            l.classList.add('active');
+        } else {
+            l.style.background = '';
+            l.style.color = '#86868b';
+            l.classList.remove('active');
+        }
+    });
+}
+
 // ---- Category filter tabs (nav bar) ----
 document.addEventListener('click', function (e) {
     var link = e.target.closest('.categoryhome');
     if (!link) return;
     e.preventDefault();
 
-    // Active state
-    document.querySelectorAll('.categoryhome').forEach(function (l) {
-        l.style.background = '';
-        l.style.color = '#86868b';
-    });
-    link.style.background = 'var(--bg-dark)';
-    link.style.color = '#fff';
-
     var cat_id = link.getAttribute('cid') || '0';
+    var cat_name = link.innerText.trim();
 
-    // Scroll to products
-    var section = document.getElementById('new-arrivals');
-    if (section) section.scrollIntoView({ behavior: 'smooth' });
-
-    // AJAX load products
-    $.ajax({
-        url: 'homeaction.php',
-        method: 'POST',
-        data: { get_seleted_Category: true, cat_id: cat_id },
-        beforeSend: function () {
-            $('#get_product_home').css('opacity', '0.4').css('transition', 'opacity 0.2s');
-        },
-        success: function (data) {
-            $('#get_product_home').html(data).css('opacity', '1');
-            if (window.reObserveFadeIn) window.reObserveFadeIn();
-        }
-    });
+    if (String(cat_id) === '0') {
+        showStackedView();
+    } else {
+        loadCategoryStack(cat_id, cat_name);
+    }
 });
 
 // ---- Newsletter submit ----
@@ -232,23 +229,94 @@ function submitNewsletter(e) {
     return false;
 }
 
-// ---- filterProductsByCategory (from featured section links) ----
-function filterProductsByCategory(cat_id) {
-    var section = document.getElementById('new-arrivals');
-    if (section) section.scrollIntoView({ behavior: 'smooth' });
+// ---- STACKED CARDS: Load category products ----
+function loadCategoryStack(catId, catName) {
+    // Prevent click bubbling from .stack-group onclick
+    if (typeof event !== 'undefined' && event) event.stopPropagation();
 
-    $.ajax({
-        url: 'homeaction.php',
-        method: 'POST',
-        data: { get_seleted_Category: true, cat_id: cat_id },
-        beforeSend: function () {
-            $('#get_product_home').css('opacity', '0.4');
-        },
-        success: function (data) {
-            $('#get_product_home').html(data).css('opacity', '1');
-            if (window.reObserveFadeIn) window.reObserveFadeIn();
-        }
-    });
+    updateCategoryNavActive(catId);
+
+    var stackedView  = document.getElementById('stacked-view');
+    var gridView     = document.getElementById('product-grid-view');
+    var titleEl      = document.getElementById('grid-cat-title');
+
+    if (!stackedView || !gridView) return;
+
+    // Update title
+    if (titleEl) titleEl.textContent = catName;
+
+    // Animate stacked view out, grid in
+    stackedView.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    stackedView.style.opacity    = '0';
+    stackedView.style.transform  = 'translateY(-10px)';
+
+    setTimeout(function () {
+        stackedView.style.display = 'none';
+        gridView.style.display    = 'block';
+        gridView.style.opacity    = '0';
+        gridView.style.transition = 'opacity 0.3s ease';
+
+        // Scroll to section
+        var section = document.getElementById('new-arrivals');
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        // Load products via AJAX
+        $.ajax({
+            url: 'homeaction.php',
+            method: 'POST',
+            data: { get_seleted_Category: true, cat_id: catId },
+            beforeSend: function () {
+                $('#get_product_home').html(
+                    '<div style="text-align:center;padding:80px 0;">' +
+                    '<i class="fa fa-spinner fa-spin" style="font-size:36px;color:#0071e3;"></i>' +
+                    '<p style="margin-top:16px;color:#86868b;">Memuat produk...</p>' +
+                    '</div>'
+                );
+            },
+            success: function (data) {
+                $('#get_product_home').html(data);
+                setTimeout(function () {
+                    gridView.style.opacity = '1';
+                    if (window.reObserveFadeIn) window.reObserveFadeIn();
+                }, 50);
+            }
+        });
+    }, 280);
+}
+
+// ---- STACKED CARDS: Return to stacked view ----
+function showStackedView() {
+    updateCategoryNavActive(0);
+
+    var stackedView = document.getElementById('stacked-view');
+    var gridView    = document.getElementById('product-grid-view');
+
+    if (!stackedView || !gridView) return;
+
+    gridView.style.transition = 'opacity 0.25s ease';
+    gridView.style.opacity    = '0';
+
+    setTimeout(function () {
+        gridView.style.display    = 'none';
+        stackedView.style.display = 'grid';
+        stackedView.style.opacity = '0';
+        stackedView.style.transform = 'translateY(10px)';
+
+        var section = document.getElementById('new-arrivals');
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        setTimeout(function () {
+            stackedView.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+            stackedView.style.opacity    = '1';
+            stackedView.style.transform  = 'translateY(0)';
+        }, 50);
+    }, 220);
+}
+
+// ---- filterProductsByCategory (from featured section) ----
+function filterProductsByCategory(cat_id) {
+    var catNames = {1: 'Elektronik', 2: 'Ladies Wear', 3: 'Mens Wear', 4: 'Olahraga'};
+    loadCategoryStack(cat_id, catNames[cat_id] || 'Produk');
 }
 </script>
 

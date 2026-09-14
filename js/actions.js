@@ -100,24 +100,13 @@ $(document).ready(function(){
     $("body").delegate(".categoryhome","click",function(event){
 		event.preventDefault();
 		var cid = $(this).attr('cid');
-
-		// Highlight active category
-		$('.categoryhome').css({'background':'','color':'#86868b'});
-		$(this).css({'background':'var(--bg-dark)','color':'#fff'});
-
-		$.ajax({
-			url		:	"homeaction.php",
-			method	:	"POST",
-			data	:	{get_seleted_Category:1, cat_id:cid},
-			beforeSend: function(){
-				$('#get_product_home').css('opacity','0.4');
-			},
-			success	:	function(data){
-				$("#get_product_home").html(data).css('opacity','1');
-				if(window.reObserveFadeIn) window.reObserveFadeIn();
-			}
-		});
-	})
+		var cname = $(this).text().trim();
+		if (cid == 0) {
+			if (typeof showStackedView === 'function') showStackedView();
+		} else {
+			if (typeof loadCategoryStack === 'function') loadCategoryStack(cid, cname);
+		}
+	});
 
 	/*	when page is load successfully then there is a list of brands when user click on brand we will get brand id and 
 		according to brand id we will show products

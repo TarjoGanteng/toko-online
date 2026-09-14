@@ -44,7 +44,7 @@
 </section>
 
 <!-- ============================================================
-     PRODUCT SECTION — WITH CATEGORY FILTER
+     PRODUCT SECTION — STACKED CATEGORY CARDS
 ============================================================ -->
 <section id="new-arrivals" class="section" style="background:var(--bg-primary);">
     <div class="container">
@@ -52,26 +52,108 @@
         <div class="section-title fade-in">
             <span class="eyebrow">Koleksi Kami</span>
             <h2 class="title">Produk Pilihan</h2>
-            <p class="subtitle">Dari elektronik canggih hingga fashion terkini — semuanya ada di sini</p>
+            <p class="subtitle">Pilih kategori favorit Anda, atau jelajahi semua produk kami</p>
         </div>
 
-        <!-- Loading state -->
-        <div id="product_msg"></div>
+        <!-- ============ STACKED CATEGORY CARDS (default view) ============ -->
+        <div id="stacked-view" class="stacked-categories">
+            <?php
+            $stack_cats = [
+                ['id'=>1, 'name'=>'Elektronik',  'icon'=>'fa-laptop',        'accent'=>'#0071e3', 'grad'=>'linear-gradient(135deg,#0a1f44,#0071e3)', 'light'=>'#deeeff'],
+                ['id'=>2, 'name'=>'Ladies Wear', 'icon'=>'fa-star',          'accent'=>'#d63384', 'grad'=>'linear-gradient(135deg,#6f1d3e,#d63384)', 'light'=>'#ffe0ef'],
+                ['id'=>3, 'name'=>'Mens Wear',   'icon'=>'fa-shield',        'accent'=>'#5856d6', 'grad'=>'linear-gradient(135deg,#1a1355,#5856d6)', 'light'=>'#e8e6ff'],
+            ];
+            foreach ($stack_cats as $cat):
+                // Top product
+                $sql_p = "SELECT * FROM product WHERE product_cat={$cat['id']} ORDER BY product_id DESC LIMIT 1";
+                $res_p = mysqli_query($con, $sql_p);
+                $p     = $res_p ? mysqli_fetch_assoc($res_p) : null;
 
-        <!-- Product Grid -->
-        <div class="product-grid" id="get_product_home">
-            <!-- Skeleton loading cards -->
-            <?php for($i = 0; $i < 6; $i++): ?>
-            <div class="product-card" style="animation: pulse 1.5s infinite; opacity:0.5;">
-                <div class="card-img" style="min-height:220px; background:#e8e8ed;"></div>
-                <div class="card-body">
-                    <div style="height:12px; background:#e8e8ed; border-radius:6px; margin-bottom:8px; width:40%;"></div>
-                    <div style="height:18px; background:#e8e8ed; border-radius:6px; margin-bottom:8px; width:80%;"></div>
-                    <div style="height:14px; background:#e8e8ed; border-radius:6px; margin-bottom:16px; width:60%;"></div>
-                    <div style="height:38px; background:#e8e8ed; border-radius:20px;"></div>
+                // Count
+                $res_c = mysqli_query($con, "SELECT COUNT(*) AS c FROM product WHERE product_cat={$cat['id']}");
+                $cnt   = $res_c ? (int)mysqli_fetch_assoc($res_c)['c'] : 0;
+
+                $img   = 'img/no-image.png';
+                $title = 'Produk Terbaik';
+                $price = 0;
+                if ($p) {
+                    $img_f = $p['product_image'] ?? 'no-image.png';
+                    if (!empty($img_f) && $img_f !== 'no-image.png') $img = 'img/' . htmlspecialchars($img_f);
+                    $title = htmlspecialchars($p['product_title'] ?? 'Produk');
+                    $price = (int)($p['product_price'] ?? 0);
+                }
+            ?>
+            <div class="stack-group fade-in" data-cat="<?= $cat['id'] ?>">
+                <div class="stack-wrapper">
+
+                    <!-- Back cards (visual depth) -->
+                    <div class="stack-card stack-card-back-2" style="background:<?= $cat['light'] ?>;"></div>
+                    <div class="stack-card stack-card-back-1" style="background:<?= $cat['light'] ?>;"></div>
+
+                    <!-- Front card (main) -->
+                    <div class="stack-card stack-card-front">
+
+                        <!-- Gradient header -->
+                        <div class="stack-header" style="background:<?= $cat['grad'] ?>;">
+                            <div class="stack-header-icon">
+                                <i class="fa <?= $cat['icon'] ?>"></i>
+                            </div>
+                            <div class="stack-header-info">
+                                <span class="stack-cat-name"><?= htmlspecialchars($cat['name']) ?></span>
+                                <span class="stack-cat-count"><?= $cnt ?> Produk</span>
+                            </div>
+                        </div>
+
+                        <!-- Product image -->
+                        <div class="stack-img-wrap">
+                            <img src="<?= $img ?>" alt="<?= $title ?>" onerror="this.src='img/no-image.png'">
+                        </div>
+
+                        <!-- Product info -->
+                        <div class="stack-body">
+                            <p class="stack-label">Produk Terpopuler</p>
+                            <h3 class="stack-title"><?= $title ?></h3>
+                            <?php if ($price > 0): ?>
+                            <p class="stack-price" style="color:<?= $cat['accent'] ?>;">
+                                Rp <?= number_format($price, 0, ',', '.') ?>
+                            </p>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- CTA — revealed on hover -->
+                        <div class="stack-cta">
+                            <button class="stack-btn" style="background:<?= $cat['accent'] ?>;"
+                                onclick="loadCategoryStack(<?= $cat['id'] ?>, '<?= addslashes($cat['name']) ?>')">
+                                Lihat Semua <?= htmlspecialchars($cat['name']) ?>
+                                <i class="fa fa-arrow-right"></i>
+                            </button>
+                        </div>
+
+                    </div><!-- end front card -->
+                </div><!-- end wrapper -->
+            </div><!-- end stack-group -->
+            <?php endforeach; ?>
+        </div><!-- end stacked-view -->
+
+        <!-- ============ PRODUCT GRID VIEW (shown after category clicked) ============ -->
+        <div id="product-grid-view" style="display:none;">
+
+            <!-- Grid header -->
+            <div class="grid-view-header">
+                <div>
+                    <span class="eyebrow">Menampilkan</span>
+                    <h3 id="grid-cat-title" style="font-size:22px; font-weight:700; margin:4px 0 0; letter-spacing:-0.02em;"></h3>
                 </div>
+                <button class="btn-outline" onclick="showStackedView()" style="display:inline-flex; gap:8px;">
+                    <i class="fa fa-th-large"></i> Semua Kategori
+                </button>
             </div>
-            <?php endfor; ?>
+
+            <!-- Products loaded via AJAX -->
+            <div class="product-grid" id="get_product_home"></div>
+
+        </div><!-- end product-grid-view -->
+
     </div>
 </section>
 
