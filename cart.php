@@ -4,7 +4,7 @@ include "db.php";
 ?>
 
 <!-- ============================================================
-     HALAMAN KERANJANG BELANJA - REDESIGN ELEGAN
+     HALAMAN KERANJANG BELANJA
 ============================================================ -->
 <style>
 .cart-page { background:#f5f5f7; min-height:70vh; padding:48px 0 80px; }
