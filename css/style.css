@@ -246,7 +246,11 @@ button { cursor: pointer; border: none; font-family: var(--font); }
   display: none;
   z-index: 999;
 }
-.header-ctn .dropdown:hover .cart-dropdown { display: block; }
+/* cart-wrap: wrapper posisi relatif untuk dropdown preview */
+.cart-wrap {
+  position: relative;
+}
+.cart-wrap:hover .cart-dropdown { display: block; }
 .cart-list { max-height: 280px; overflow-y: auto; }
 .cart-btns { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
 .cart-btns a {

@@ -1,5 +1,5 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) session_start();
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -45,19 +45,27 @@ session_start();
                 <?php
                 include "db.php";
                 if (isset($_SESSION["uid"])) {
-                    $sql   = "SELECT first_name FROM user_info WHERE user_id='$_SESSION[uid]'";
+                    $sql   = "SELECT * FROM user_info WHERE user_id='$_SESSION[uid]' LIMIT 1";
                     $query = mysqli_query($con, $sql);
-                    $row   = mysqli_fetch_array($query);
+                    $row   = mysqli_fetch_assoc($query);
+                    $fname = htmlspecialchars($row['first_name'] ?? '');
+                    $lname = htmlspecialchars($row['last_name'] ?? '');
                     echo '
                     <div class="dropdownn">
-                        <a href="#" class="dropdownn">
-                            <i class="fa fa-user-o"></i> Hi, ' . htmlspecialchars($row["first_name"]) . '
+                        <a href="" data-toggle="modal" data-target="#Modal_profile" class="dropdownn" style="color:var(--accent);font-weight:600;">
+                            <i class="fa fa-user-circle-o"></i> Hi, ' . $fname . '
                         </a>
                         <div class="dropdownn-content">
-                            <a href="" data-toggle="modal" data-target="#profile">
+                            <a href="" data-toggle="modal" data-target="#Modal_profile">
                                 <i class="fa fa-user-circle"></i> My Profile
                             </a>
-                            <a href="logout.php">
+                            <a href="orders.php">
+                                <i class="fa fa-list-alt"></i> Pesanan Saya
+                            </a>
+                            <a href="cart.php">
+                                <i class="fa fa-shopping-bag"></i> Keranjang Saya
+                            </a>
+                            <a href="logout.php" style="color:#e74c3c;">
                                 <i class="fa fa-sign-out"></i> Log Out
                             </a>
                         </div>
@@ -65,7 +73,7 @@ session_start();
                 } else {
                     echo '
                     <div class="dropdownn">
-                        <a href="#" class="dropdownn">
+                        <a href="" data-toggle="modal" data-target="#Modal_login" class="dropdownn">
                             <i class="fa fa-user-o"></i> My Account
                         </a>
                         <div class="dropdownn-content">
@@ -160,11 +168,22 @@ session_start();
             </div>
 
             <!-- HEADER RIGHT -->
-            <div class="header-ctn" style="flex-shrink:0; display:flex; align-items:center; gap:4px;">
+            <div class="header-ctn" style="flex-shrink:0; display:flex; align-items:center; gap:8px;">
 
-                <!-- Cart Dropdown -->
-                <div class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="display:flex; align-items:center; gap:6px;">
+                <!-- Pesanan Saya Button -->
+                <a href="<?php echo isset($_SESSION['uid']) ? 'orders.php' : '#'; ?>" 
+                   <?php echo !isset($_SESSION['uid']) ? 'data-toggle="modal" data-target="#Modal_login"' : ''; ?>
+                   class="header-orders-btn"
+                   style="display:flex; align-items:center; gap:6px; text-decoration:none; color:var(--text-primary,#1d1d1f); padding:7px 14px; border-radius:980px; background:var(--bg-secondary,#f5f5f7); font-size:13px; font-weight:600; border:1px solid rgba(0,0,0,0.06); transition:all .2s;"
+                   onmouseover="this.style.background='#e8e8ed';this.style.color='#0071e3';"
+                   onmouseout="this.style.background='var(--bg-secondary,#f5f5f7)';this.style.color='var(--text-primary,#1d1d1f)';">
+                    <i class="fa fa-list-alt" style="color:var(--accent,#0071e3); font-size:14px;"></i>
+                    <span>Pesanan Saya</span>
+                </a>
+
+                <!-- Cart Button — klik langsung ke cart.php, hover tetap tampil preview -->
+                <div class="cart-wrap">
+                    <a href="cart.php" style="display:flex; align-items:center; gap:6px; text-decoration:none; color:inherit;">
                         <i class="fa fa-shopping-bag"></i>
                         <span style="font-size:14px; font-weight:500;">Keranjang</span>
                         <div class="badge qty" id="cart-count">0</div>
@@ -196,11 +215,16 @@ session_start();
 <!-- ============================================================
      NAVIGATION — CATEGORY BAR
 ============================================================ -->
+<?php if (basename($_SERVER['PHP_SELF']) !== 'orders.php'): ?>
 <nav id="navigation">
     <div class="container" id="get_category_home">
         <!-- Filled by AJAX homeaction.php -->
     </div>
 </nav>
+<?php endif; ?>
+
+
+
 
 <!-- ============================================================
      MODALS — LOGIN
@@ -231,3 +255,110 @@ session_start();
         </div>
     </div>
 </div>
+
+<!-- MODALS — PROFILE (hanya tampil jika sudah login) -->
+<?php if (isset($_SESSION['uid'])): ?>
+<?php
+    $sql_prof  = "SELECT * FROM user_info WHERE user_id='" . (int)$_SESSION['uid'] . "' LIMIT 1";
+    $res_prof  = mysqli_query($con, $sql_prof);
+    $user_prof = $res_prof ? mysqli_fetch_assoc($res_prof) : [];
+    $total_orders_sql = "SELECT SUM(qty) as total_qty, COUNT(DISTINCT p_id) as total_items FROM cart WHERE user_id='" . (int)$_SESSION['uid'] . "'";
+    $res_ord   = mysqli_query($con, $total_orders_sql);
+    $ord_row   = $res_ord ? mysqli_fetch_assoc($res_ord) : [];
+    $cart_items = (int)($ord_row['total_items'] ?? 0);
+    $join_date  = !empty($user_prof['created_at']) ? date('d M Y', strtotime($user_prof['created_at'])) : '-';
+    $initials   = strtoupper(substr($user_prof['first_name'] ?? 'U', 0, 1) . substr($user_prof['last_name'] ?? '', 0, 1));
+?>
+<div class="modal fade" id="Modal_profile" role="dialog">
+    <div class="modal-dialog" style="max-width:460px; margin:60px auto;">
+        <div class="modal-content" style="border-radius:18px; overflow:hidden; border:none;">
+
+            <!-- Profile Header -->
+            <div style="background:linear-gradient(135deg,#0a1f44,#0071e3); padding:36px 28px 24px; text-align:center; position:relative;">
+                <button type="button" class="close" data-dismiss="modal"
+                        style="position:absolute;top:14px;right:18px;font-size:22px;color:rgba(255,255,255,0.7);opacity:1;"
+                        aria-label="Close">&times;</button>
+
+                <!-- Avatar Inisial -->
+                <div style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.15);border:3px solid rgba(255,255,255,0.4);
+                            display:flex;align-items:center;justify-content:center;margin:0 auto 14px;
+                            font-size:30px;font-weight:800;color:#fff;letter-spacing:-1px;">
+                    <?= $initials ?>
+                </div>
+
+                <h3 style="color:#fff;margin:0;font-size:20px;font-weight:700;letter-spacing:-0.03em;">
+                    <?= htmlspecialchars(($user_prof['first_name'] ?? '') . ' ' . ($user_prof['last_name'] ?? '')) ?>
+                </h3>
+                <p style="color:rgba(255,255,255,0.6);margin:6px 0 0;font-size:13px;">
+                    <?= htmlspecialchars($user_prof['email'] ?? '') ?>
+                </p>
+            </div>
+
+            <!-- Stats Bar -->
+            <div style="display:flex;border-bottom:1px solid #f0f0f0;">
+                <div style="flex:1;text-align:center;padding:16px 8px;">
+                    <div style="font-size:22px;font-weight:700;color:#0071e3;"><?= $cart_items ?></div>
+                    <div style="font-size:11px;color:#86868b;margin-top:2px;">Item di Keranjang</div>
+                </div>
+                <div style="width:1px;background:#f0f0f0;"></div>
+                <div style="flex:1;text-align:center;padding:16px 8px;">
+                    <div style="font-size:22px;font-weight:700;color:#0071e3;"><?= $join_date ?></div>
+                    <div style="font-size:11px;color:#86868b;margin-top:2px;">Bergabung Sejak</div>
+                </div>
+            </div>
+
+            <!-- Info Detail -->
+            <div style="padding:20px 28px;">
+                <div style="display:flex;flex-direction:column;gap:12px;">
+
+                    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;
+                                background:#f8f8f8;border-radius:10px;">
+                        <i class="fa fa-user" style="color:#0071e3;font-size:16px;width:20px;text-align:center;"></i>
+                        <div>
+                            <div style="font-size:11px;color:#86868b;">Nama Lengkap</div>
+                            <div style="font-size:14px;font-weight:600;color:#1d1d1f;margin-top:2px;">
+                                <?= htmlspecialchars(($user_prof['first_name'] ?? '') . ' ' . ($user_prof['last_name'] ?? '')) ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;
+                                background:#f8f8f8;border-radius:10px;">
+                        <i class="fa fa-envelope" style="color:#0071e3;font-size:16px;width:20px;text-align:center;"></i>
+                        <div>
+                            <div style="font-size:11px;color:#86868b;">Email</div>
+                            <div style="font-size:14px;font-weight:600;color:#1d1d1f;margin-top:2px;">
+                                <?= htmlspecialchars($user_prof['email'] ?? '') ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;
+                                background:#f8f8f8;border-radius:10px;">
+                        <i class="fa fa-calendar" style="color:#0071e3;font-size:16px;width:20px;text-align:center;"></i>
+                        <div>
+                            <div style="font-size:11px;color:#86868b;">Member Sejak</div>
+                            <div style="font-size:14px;font-weight:600;color:#1d1d1f;margin-top:2px;"><?= $join_date ?></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display:flex;gap:10px;margin-top:20px;">
+                    <a href="cart.php" class="btn-primary" style="flex:1;text-align:center;padding:10px;font-size:14px;border-radius:10px;text-decoration:none;">
+                        <i class="fa fa-shopping-bag"></i> Lihat Keranjang
+                    </a>
+                    <a href="logout.php"
+                       style="flex:1;text-align:center;padding:10px;font-size:14px;border-radius:10px;text-decoration:none;
+                              background:#fff0f0;color:#e74c3c;border:1.5px solid #e74c3c;font-weight:600;
+                              display:inline-flex;align-items:center;justify-content:center;gap:6px;">
+                        <i class="fa fa-sign-out"></i> Log Out
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<?php endif; ?>

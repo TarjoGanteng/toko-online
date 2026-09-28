@@ -77,6 +77,40 @@ CREATE TABLE IF NOT EXISTS `cart` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================================
+--  TABEL: orders
+-- ============================================================
+CREATE TABLE IF NOT EXISTS `orders` (
+    `order_id`       INT AUTO_INCREMENT PRIMARY KEY,
+    `user_id`        INT NOT NULL,
+    `fname`          VARCHAR(100) NOT NULL,
+    `lname`          VARCHAR(100) DEFAULT '',
+    `email`          VARCHAR(150) NOT NULL,
+    `address`        TEXT NOT NULL,
+    `city`           VARCHAR(100) NOT NULL,
+    `state`          VARCHAR(100) DEFAULT '',
+    `zip`            VARCHAR(20) NOT NULL,
+    `total_amount`   DECIMAL(12,2) NOT NULL DEFAULT 0,
+    `payment_method` VARCHAR(50) NOT NULL DEFAULT 'transfer',
+    `status`         ENUM('pending','processing','shipped','delivered','cancelled') NOT NULL DEFAULT 'pending',
+    `created_at`     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================================
+--  TABEL: order_items
+-- ============================================================
+CREATE TABLE IF NOT EXISTS `order_items` (
+    `item_id`       INT AUTO_INCREMENT PRIMARY KEY,
+    `order_id`      INT NOT NULL,
+    `product_id`    INT NOT NULL,
+    `product_title` VARCHAR(255) NOT NULL,
+    `product_price` DECIMAL(12,2) NOT NULL,
+    `qty`           INT NOT NULL DEFAULT 1,
+    `subtotal`      DECIMAL(12,2) NOT NULL,
+    INDEX (`order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================================
 --  TABEL: newsletter
 -- ============================================================
 CREATE TABLE IF NOT EXISTS `newsletter` (

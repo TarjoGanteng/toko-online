@@ -274,3 +274,14 @@
     50% { opacity: 0.8; }
 }
 </style>
+
+<!-- Toast Notifikasi Keranjang -->
+<div id="product_msg" style="
+    position: fixed;
+    bottom: 80px;
+    right: 24px;
+    z-index: 9999;
+    min-width: 260px;
+    max-width: 360px;
+    pointer-events: none;
+"></div>

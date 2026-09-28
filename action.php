@@ -191,34 +191,32 @@ if (isset($_POST['Common'])) {
             if ($result && mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
                     $subtotal = $row['product_price'] * $row['qty'];
+                    $img_src  = !empty($row['product_image']) ? 'img/' . htmlspecialchars($row['product_image']) : 'img/no-image.png';
                     echo '<tr>
                             <td>
-                                <div class="product-widget">
-                                    <div class="product-img">
-                                        <img src="img/' . htmlspecialchars($row['product_image']) . '" alt="" style="width:60px;">
-                                    </div>
-                                    <div class="product-body">
-                                        <p class="product-name">' . htmlspecialchars($row['product_title']) . '</p>
-                                    </div>
+                                <div class="cart-product-wrap">
+                                    <img src="' . $img_src . '" alt="' . htmlspecialchars($row['product_title']) . '" onerror="this.src=\'img/no-image.png\'">
+                                    <span class="cart-product-name">' . htmlspecialchars($row['product_title']) . '</span>
                                 </div>
                             </td>
-                            <td>Rp ' . number_format($row['product_price'], 0, ',', '.') . '</td>
+                            <td style="font-weight:600; color:#1d1d1f;">Rp ' . number_format($row['product_price'], 0, ',', '.') . '</td>
                             <td>
-                                <input class="input-number qty" type="number" value="' . $row['qty'] . '" min="1" style="width:60px;">
+                                <input class="qty-input qty" type="number" value="' . $row['qty'] . '" min="1">
                                 <input type="hidden" class="price" value="' . $row['product_price'] . '">
                                 <input type="hidden" class="total" value="' . $subtotal . '">
                             </td>
-                            <td>
-                                <input type="hidden" class="total" value="' . $subtotal . '">
+                            <td style="font-weight:700; color:#1d1d1f;">
                                 Rp <span class="row-total">' . number_format($subtotal, 0, ',', '.') . '</span>
                             </td>
                             <td>
-                                <button class="remove btn btn-danger btn-sm" remove_id="' . $row['cart_id'] . '">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                                <button class="update btn btn-primary btn-sm" update_id="' . $row['cart_id'] . '">
-                                    <i class="fa fa-refresh"></i>
-                                </button>
+                                <div class="cart-action-btns">
+                                    <button class="btn-delete remove" remove_id="' . $row['cart_id'] . '" title="Hapus">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                    <button class="btn-update update" update_id="' . $row['cart_id'] . '" title="Update">
+                                        <i class="fa fa-refresh"></i>
+                                    </button>
+                                </div>
                             </td>
                           </tr>';
                 }

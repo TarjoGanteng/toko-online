@@ -11,7 +11,7 @@
         </div>
     <?php endif; ?>
 
-    <form id="login" method="POST" action="login.php">
+    <form id="login" method="POST">
         <div class="form-group">
             <label>Email Address</label>
             <input type="email" name="email" id="login_email" class="form-control" placeholder="Enter your email" required>

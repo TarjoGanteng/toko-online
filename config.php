@@ -1,20 +1,23 @@
 
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) session_start();
 
 // initializing variables
 $username = "";
 $email    = "";
 $errors = array(); 
 
-// connect to the database
-define('DB_SERVER', 'localhost');
-   define('DB_USERNAME', 'root');
-   define('DB_PASSWORD', '');
-   define('DB_DATABASE', 'ecommerce');
-   $db = mysqli_connect(DB_SERVER,DB_USERNAME,DB_PASSWORD,DB_DATABASE);
-if (!$db) {
-    die("Connection failed: " . mysqli_connect_error());
+// connect to the database (gunakan defined() agar tidak error jika di-include berkali-kali)
+if (!defined('DB_SERVER'))   define('DB_SERVER',   'localhost');
+if (!defined('DB_USERNAME')) define('DB_USERNAME', 'root');
+if (!defined('DB_PASSWORD')) define('DB_PASSWORD', '');
+if (!defined('DB_DATABASE')) define('DB_DATABASE', 'ecommerce');
+
+if (!isset($db) || !$db) {
+    $db = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_DATABASE);
+    if (!$db) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
 }
 
 // REGISTER USER

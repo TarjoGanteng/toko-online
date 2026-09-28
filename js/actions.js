@@ -169,9 +169,20 @@ $(document).ready(function(){
 			data	:$("#login").serialize(),
 			success	:function(data){
 				if(data == "login_success"){
+					// Reload halaman agar session ter-refresh
 					window.location.href = "index.php";
 				}else if(data == "cart_login"){
-					window.location.href = "cart.php";
+					// Login berhasil, ada produk pending di keranjang
+					$('#Modal_login').modal('hide');
+					$(".overlay").hide();
+					// Jika ada produk pending, tambahkan sekarang
+					if(window._pendingCartPid) {
+						var pid = window._pendingCartPid;
+						window._pendingCartPid = null;
+						addProductToCart(pid);
+					} else {
+						window.location.href = "index.php";
+					}
 				}else{
 					$("#e_msg").html(data);
 					$(".overlay").hide();
@@ -222,23 +233,71 @@ $(document).ready(function(){
 	//Get User Information before checkout end here
 
 	//Add Product into Cart
-	$("body").delegate("#product","click",function(event){
-		var pid = $(this).attr("pid");
-		
-		event.preventDefault();
+	// Fungsi inti: kirim produk ke keranjang via AJAX
+	window.addProductToCart = function(pid) {
 		$(".overlay").show();
 		$.ajax({
 			url : "action.php",
 			method : "POST",
-			data : {addToCart:1,proId:pid,},
+			data : {addToCart:1, proId:pid},
 			success : function(data){
 				count_item();
 				getCartItem();
-				$('#product_msg').html(data);
 				$('.overlay').hide();
+				// Tampilkan notifikasi dengan SweetAlert
+				if (data.indexOf('alert-success') !== -1) {
+					swal("Berhasil!", "Produk berhasil ditambahkan ke keranjang!", "success");
+				} else if (data.indexOf('alert-info') !== -1) {
+					swal("Info", "Jumlah produk diperbarui di keranjang!", "info");
+				} else if (data.indexOf('alert-warning') !== -1) {
+					// Belum login — buka modal login
+					window._pendingCartPid = pid;
+					$('#Modal_login').modal('show');
+				} else {
+					$('#product_msg').html(data);
+				}
 			}
 		})
+	};
+
+	// Handler klik tombol Tambah ke Keranjang (gunakan class, bukan id)
+	$("body").on("click", ".add-to-cart-btn", function(event){
+		event.preventDefault();
+		var pid = $(this).attr("pid");
+		if (!pid) return;
+
+		// Cek status login dari PHP (di-embed via variabel global)
+		if (typeof window.IS_LOGGED_IN !== 'undefined' && !window.IS_LOGGED_IN) {
+			// Simpan pid yang pending lalu buka modal login
+			window._pendingCartPid = pid;
+			$('#Modal_login').modal('show');
+			return;
+		}
+
+		addProductToCart(pid);
 	})
+
+	// Tampilkan pesan info di modal login jika dibuka dari konteks keranjang
+	$('#Modal_login').on('show.bs.modal', function() {
+		if (window._pendingCartPid) {
+			var $info = $('#e_msg');
+			$info.html(
+				'<div class="alert alert-info" style="margin-bottom:12px;">' +
+				'<i class="fa fa-shopping-cart"></i> ' +
+				'Silakan login terlebih dahulu untuk menambahkan produk ke keranjang.' +
+				'</div>'
+			);
+		} else {
+			$('#e_msg').html('');
+		}
+	});
+	$('#Modal_login').on('hidden.bs.modal', function() {
+		// Bersihkan pending cart jika modal ditutup tanpa login
+		if (window._pendingCartPid && !window.IS_LOGGED_IN) {
+			window._pendingCartPid = null;
+			$('#e_msg').html('');
+		}
+	});
 	//Add Product into Cart End Here
 	//Count user cart items funtion
 	count_item();
@@ -295,7 +354,8 @@ $(document).ready(function(){
 		$('.total').each(function(){
 			net_total += ($(this).val()-0);
 		})
-		$('.net_total').html("Total : $ " +net_total);
+		$('.net_total').text('Rp ' + net_total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
+
 
 	})
 	//Change Quantity end here 
@@ -363,21 +423,27 @@ $(document).ready(function(){
 			}
 		})
 	}
-	/*
-		net_total function is used to calcuate total amount of cart item
-	*/
+	// Helper: format angka ke Rupiah (misal 1000000 → Rp 1.000.000)
+	function formatRupiah(angka) {
+		var num = Math.round(parseFloat(angka) || 0);
+		return 'Rp ' + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+	}
+
 	function net_total(){
-		var net_total = 0;
+		var total_sum = 0;
 		$('.qty').each(function(){
-			var row = $(this).parent().parent();
-			var price  = row.find('.price').val();
-			var total = price * $(this).val()-0;
-			row.find('.total').val(total);
-		})
+			var row   = $(this).closest('tr');
+			var price = parseFloat(row.find('.price').val()) || 0;
+			var qty   = parseInt($(this).val()) || 1;
+			var sub   = price * qty;
+			row.find('.total').val(sub);
+			row.find('.row-total').text(sub.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
+		});
 		$('.total').each(function(){
-			net_total += ($(this).val()-0);
-		})
-		$('.net_total').html("Total : $ " +net_total);
+			total_sum += (parseFloat($(this).val()) || 0);
+		});
+		var formatted = formatRupiah(total_sum);
+		$('.net_total').text(formatted);
 	}
 
 	//remove product from cart

@@ -1,3 +1,4 @@
+<?php if (session_status() === PHP_SESSION_NONE) session_start(); ?>
 <!-- ============================================================
      NEWSLETTER STRIP — FULL WIDTH
 ============================================================ -->
@@ -74,7 +75,7 @@
                 <h4>Layanan</h4>
                 <ul>
                     <li><a href="#">Cara Belanja</a></li>
-                    <li><a href="#">Lacak Pesanan</a></li>
+                    <li><a href="orders.php">Lacak Pesanan / Pesanan Saya</a></li>
                     <li><a href="#">Pengembalian Barang</a></li>
                     <li><a href="#">FAQ</a></li>
                     <li><a href="cart.php">Keranjang Belanja</a></li>
@@ -126,6 +127,10 @@
 <!-- ============================================================
      JS FILES
 ============================================================ -->
+<!-- PHP Session Status untuk JS -->
+<script>
+    window.IS_LOGGED_IN = <?php echo isset($_SESSION['uid']) ? 'true' : 'false'; ?>;
+</script>
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/slick.min.js"></script>
@@ -133,9 +138,9 @@
 <script src="js/jquery.zoom.min.js"></script>
 <script src="js/jquery.payform.min.js"></script>
 <script src="js/sweetalert.min.js"></script>
-<script src="js/main.js"></script>
-<script src="js/actions.js"></script>
-<script src="js/script.js"></script>
+<script src="js/main.js?v=<?php echo filemtime('js/main.js'); ?>"></script>
+<script src="js/actions.js?v=<?php echo filemtime('js/actions.js'); ?>"></script>
+<script src="js/script.js?v=<?php echo filemtime('js/script.js'); ?>"></script>
 
 <!-- ============================================================
      INLINE SCRIPTS — Scroll animations, category filter, scroll-to-top
