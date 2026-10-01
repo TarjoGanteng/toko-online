@@ -93,11 +93,22 @@ if (isset($_POST['selectBrand'])) {
 // ============================================================
 if (isset($_POST['search'])) {
     $keyword = mysqli_real_escape_string($con, $_POST['keyword']);
-    $sql     = "SELECT p.*, c.cat_title, c.cat_name, b.brand_title
+    $cat_id  = isset($_POST['cat_id']) ? (int)$_POST['cat_id'] : 0;
+
+    if ($cat_id > 0) {
+        $sql = "SELECT p.*, c.cat_title, c.cat_name, b.brand_title
+                FROM product p
+                LEFT JOIN category c ON p.product_cat = c.cat_id
+                LEFT JOIN brand b ON p.product_brand = b.brand_id
+                WHERE p.product_cat = '$cat_id'
+                  AND (p.product_title LIKE '%$keyword%' OR p.product_keywords LIKE '%$keyword%')";
+    } else {
+        $sql = "SELECT p.*, c.cat_title, c.cat_name, b.brand_title
                 FROM product p
                 LEFT JOIN category c ON p.product_cat = c.cat_id
                 LEFT JOIN brand b ON p.product_brand = b.brand_id
                 WHERE p.product_title LIKE '%$keyword%' OR p.product_keywords LIKE '%$keyword%'";
+    }
     $result = mysqli_query($con, $sql);
     renderProducts($result);
 }

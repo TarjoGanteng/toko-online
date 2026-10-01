@@ -129,29 +129,116 @@ $(document).ready(function(){
 		})
 	
 	})
+
 	/*
-		At the top of page there is a search box with search button when user put name of product then we will take the user 
-		given string and with the help of sql query we will match user given string to our database keywords column then matched product 
-		we will show 
+		SEARCH — Global doSearch() function
+		Dipanggil dari form onsubmit (header.php) maupun klik tombol Cari.
+		Mendeteksi apakah pengguna ada di halaman utama (#product-grid-view) atau halaman shop (#get_product).
+		Mendukung filter kategori dari dropdown #search-category.
+		Jika keyword KOSONG: reset tampilan ke kondisi semula (sebelum pencarian).
 	*/
-	$("#search_btn").click(function(){
-		$("#get_product").html("<h3>Loading...</h3>");
-		var keyword = $("#search").val();
-		if(keyword != ""){
-			$.ajax({
-			url		:	"action.php",
-			method	:	"POST",
-			data	:	{search:1,keyword:keyword},
-			success	:	function(data){ 
-				$("#get_product").html(data);
-				if($("body").width() < 480){
-					$("body").scrollTop(683);
-				}
+	window.doSearch = function() {
+		var keyword = $("#search").val().trim();
+		var cat_id  = $("#search-category").val() || "0";
+
+		// Deteksi halaman utama (ada elemen #product-grid-view)
+		var isHomePage = $("#product-grid-view").length > 0;
+
+		// ====== KEYWORD KOSONG → RESET KE TAMPILAN SEMULA ======
+		if (keyword === "") {
+			if (isHomePage) {
+				// Kembalikan stacked category view
+				$("#product-grid-view").hide();
+				$("#stacked-view").show();
+				// Reload produk default di grid (untuk saat grid aktif nanti)
+				$.ajax({
+					url    : "homeaction.php",
+					method : "POST",
+					data   : { getProducthome: 1 },
+					success: function(data) {
+						$("#get_product_home").html(data);
+						if (window.reObserveFadeIn) window.reObserveFadeIn();
+					}
+				});
+			} else {
+				// Reset ke semua produk
+				$.ajax({
+					url    : "action.php",
+					method : "POST",
+					data   : { getProduct: 1 },
+					success: function(data) {
+						$("#get_product").html(data);
+					}
+				});
 			}
-		})
+			return;
 		}
-	})
-	//end
+
+		// ====== ADA KEYWORD → LAKUKAN PENCARIAN ======
+		if (isHomePage) {
+			// --- HALAMAN UTAMA ---
+			// Scroll ke section produk
+			var $section = $("#new-arrivals");
+			if ($section.length) {
+				$("html, body").animate({ scrollTop: $section.offset().top - 80 }, 400);
+			}
+
+			// Tampilkan grid view & sembunyikan stacked view
+			$("#stacked-view").hide();
+			$("#product-grid-view").show();
+
+			// Set judul hasil pencarian
+			var catLabel = $("#search-category option:selected").text();
+			var titleText = 'Hasil: "' + keyword + '"' + (cat_id !== "0" ? " — " + catLabel : "");
+			$("#grid-cat-title").text(titleText);
+
+			// Tampilkan loading state
+			$("#get_product_home").html(
+				'<div style="grid-column:1/-1; text-align:center; padding:40px; color:#86868b;">' +
+				'<i class="fa fa-spinner fa-spin" style="font-size:28px;"></i>' +
+				'<p style="margin-top:12px; font-size:14px;">Mencari produk...</p>' +
+				'</div>'
+			);
+
+			$.ajax({
+				url    : "homeaction.php",
+				method : "POST",
+				data   : { searchHome: 1, keyword: keyword, cat_id: cat_id },
+				success: function(data) {
+					$("#get_product_home").html(data);
+					if (window.reObserveFadeIn) window.reObserveFadeIn();
+				}
+			});
+
+		} else {
+			// --- HALAMAN SHOP / LAINNYA (ada #get_product) ---
+			$("#get_product").html("<h3>Loading...</h3>");
+
+			var postData = { search: 1, keyword: keyword };
+			if (cat_id !== "0") {
+				postData.cat_id = cat_id;
+			}
+
+			$.ajax({
+				url    : "action.php",
+				method : "POST",
+				data   : postData,
+				success: function(data) {
+					$("#get_product").html(data);
+					if ($(window).width() < 480) {
+						$("body").scrollTop(683);
+					}
+				}
+			});
+		}
+	};
+
+	// Dukung klik tombol Cari (juga sebagai backup selain onsubmit form)
+	$("#search_btn").off("click").on("click", function(e) {
+		e.preventDefault();
+		window.doSearch();
+	});
+	//end search
 
 
 	/*
@@ -364,8 +451,7 @@ $(document).ready(function(){
 		whenever user click on .remove class we will take product id of that row 
 		and send it to action.php to perform product removal operation
 	*/
-    
-	   
+    	   
     $("body").delegate(".remove","click",function(event){
         var remove = $(this).parent().parent().parent();
         var remove_id = remove.find(".remove").attr("remove_id");
@@ -471,25 +557,3 @@ $(document).ready(function(){
 		})
 	})
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

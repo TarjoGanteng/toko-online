@@ -62,11 +62,10 @@
             <div class="footer-col">
                 <h4>Informasi</h4>
                 <ul>
-                    <li><a href="#">Tentang Kami</a></li>
-                    <li><a href="#">Karier</a></li>
-                    <li><a href="#">Berita & Blog</a></li>
-                    <li><a href="#">Kebijakan Privasi</a></li>
-                    <li><a href="#">Syarat & Ketentuan</a></li>
+                    <li><a href="about.php">Tentang Kami</a></li>
+                    <li><a href="blog.php">Berita &amp; Blog</a></li>
+                    <li><a href="privacy.php">Kebijakan Privasi</a></li>
+                    <li><a href="terms.php">Syarat &amp; Ketentuan</a></li>
                 </ul>
             </div>
 
@@ -74,10 +73,9 @@
             <div class="footer-col">
                 <h4>Layanan</h4>
                 <ul>
-                    <li><a href="#">Cara Belanja</a></li>
-                    <li><a href="orders.php">Lacak Pesanan / Pesanan Saya</a></li>
-                    <li><a href="#">Pengembalian Barang</a></li>
-                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#" onclick="openModal('modal-cara-belanja'); return false;">Cara Belanja</a></li>
+                    <li><a href="orders.php">Pesanan Saya</a></li>
+                    <li><a href="#" onclick="openModal('modal-faq'); return false;">FAQ</a></li>
                     <li><a href="cart.php">Keranjang Belanja</a></li>
                 </ul>
             </div>
@@ -117,12 +115,100 @@
             Tugas Praktik Manajemen Sistem Informasi &nbsp;|&nbsp; Universitas Negeri Yogyakarta
         </p>
         <div class="footer-legal">
-            <a href="#">Privasi</a>
-            <a href="#">Ketentuan</a>
-            <a href="#">Sitemap</a>
+            <a href="privacy.php">Privasi</a>
+            <a href="terms.php">Ketentuan</a>
+            <a href="about.php">Tentang Kami</a>
         </div>
     </div>
 </div>
+
+<!-- ============================================================
+     MODAL — CARA BELANJA
+============================================================ -->
+<div id="modal-cara-belanja" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px);" onclick="if(event.target===this) closeModal('modal-cara-belanja')">
+    <div style="background:#fff; border-radius:20px; max-width:540px; width:90%; margin:60px auto; padding:40px 36px; position:relative; max-height:85vh; overflow-y:auto;">
+        <button onclick="closeModal('modal-cara-belanja')" style="position:absolute;top:16px;right:20px;background:none;border:none;font-size:22px;cursor:pointer;color:#86868b;">&times;</button>
+        <h2 style="font-size:22px;font-weight:700;margin-bottom:8px;letter-spacing:-0.03em;">Cara Belanja</h2>
+        <p style="color:#86868b;font-size:13px;margin-bottom:28px;">Mudah &amp; cepat dalam 4 langkah</p>
+        <div style="display:flex;flex-direction:column;gap:20px;">
+            <?php
+            $steps = [
+                ['icon'=>'fa-search',       'num'=>'1','title'=>'Cari Produk',      'desc'=>'Gunakan kolom pencarian atau pilih kategori untuk menemukan produk yang Anda inginkan.'],
+                ['icon'=>'fa-shopping-cart','num'=>'2','title'=>'Tambah ke Keranjang','desc'=>'Klik tombol "Tambah ke Keranjang". Anda bisa menambahkan beberapa produk sekaligus.'],
+                ['icon'=>'fa-user',         'num'=>'3','title'=>'Login & Checkout',  'desc'=>'Pastikan sudah login, buka halaman keranjang, lalu klik "Checkout" untuk melanjutkan.'],
+                ['icon'=>'fa-check-circle', 'num'=>'4','title'=>'Pembayaran',        'desc'=>'Isi data pengiriman dan pilih metode pembayaran. Pesanan diproses setelah pembayaran dikonfirmasi.'],
+            ];
+            foreach ($steps as $s): ?>
+            <div style="display:flex;gap:16px;align-items:flex-start;">
+                <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#0a1f44,#0071e3);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fa <?= $s['icon'] ?>" style="color:#fff;font-size:16px;"></i>
+                </div>
+                <div>
+                    <p style="font-size:11px;color:#0071e3;font-weight:600;margin:0 0 2px;">LANGKAH <?= $s['num'] ?></p>
+                    <h4 style="font-size:15px;font-weight:700;margin:0 0 4px;"><?= $s['title'] ?></h4>
+                    <p style="font-size:13px;color:#86868b;margin:0;line-height:1.5;"><?= $s['desc'] ?></p>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <a href="index.php" onclick="closeModal('modal-cara-belanja')" style="display:block;text-align:center;margin-top:28px;padding:12px;background:linear-gradient(135deg,#0a1f44,#0071e3);color:#fff;border-radius:12px;text-decoration:none;font-weight:600;font-size:14px;">
+            <i class="fa fa-shopping-bag"></i> Mulai Belanja Sekarang
+        </a>
+    </div>
+</div>
+
+<!-- ============================================================
+     MODAL — FAQ
+============================================================ -->
+<div id="modal-faq" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px);" onclick="if(event.target===this) closeModal('modal-faq')">
+    <div style="background:#fff; border-radius:20px; max-width:580px; width:90%; margin:60px auto; padding:40px 36px; position:relative; max-height:85vh; overflow-y:auto;">
+        <button onclick="closeModal('modal-faq')" style="position:absolute;top:16px;right:20px;background:none;border:none;font-size:22px;cursor:pointer;color:#86868b;">&times;</button>
+        <h2 style="font-size:22px;font-weight:700;margin-bottom:8px;letter-spacing:-0.03em;">FAQ</h2>
+        <p style="color:#86868b;font-size:13px;margin-bottom:28px;">Pertanyaan yang sering ditanyakan</p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+            <?php
+            $faqs = [
+                ['q'=>'Apakah saya harus login untuk berbelanja?','a'=>'Ya, Anda perlu membuat akun dan login sebelum checkout. Namun Anda bisa melihat-lihat produk tanpa login.'],
+                ['q'=>'Berapa lama waktu pengiriman?','a'=>'Biasanya 1–3 hari kerja tergantung lokasi Anda.'],
+                ['q'=>'Metode pembayaran apa saja yang tersedia?','a'=>'Transfer Bank, Kartu Kredit/Debit (Visa, Mastercard), dan pembayaran digital lainnya.'],
+                ['q'=>'Bagaimana cara melacak pesanan?','a'=>'Login ke akun Anda lalu buka menu "Pesanan Saya" untuk melihat status pesanan secara real-time.'],
+                ['q'=>'Apakah produk bergaransi?','a'=>'Produk elektronik dilengkapi garansi resmi dari distributor. Detail garansi tercantum di halaman produk.'],
+                ['q'=>'Bisakah saya membatalkan pesanan?','a'=>'Pembatalan dapat dilakukan selama pesanan masih berstatus "Pending". Hubungi kami segera via email atau telepon.'],
+            ];
+            foreach ($faqs as $faq): ?>
+            <div class="faq-item" style="border:1px solid #f0f0f0;border-radius:12px;overflow:hidden;">
+                <button onclick="toggleFaq(this)" style="width:100%;text-align:left;padding:16px 20px;background:#fff;border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600;color:#1d1d1f;">
+                    <?= htmlspecialchars($faq['q']) ?>
+                    <i class="fa fa-plus" style="color:#0071e3;font-size:12px;flex-shrink:0;margin-left:12px;"></i>
+                </button>
+                <div class="faq-answer" style="display:none;padding:0 20px 16px;font-size:13px;color:#86868b;line-height:1.6;"><?= htmlspecialchars($faq['a']) ?></div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
+
+<script>
+function openModal(id) {
+    var m = document.getElementById(id);
+    if (m) { m.style.display = 'block'; document.body.style.overflow = 'hidden'; }
+}
+function closeModal(id) {
+    var m = document.getElementById(id);
+    if (m) { m.style.display = 'none'; document.body.style.overflow = ''; }
+}
+function toggleFaq(btn) {
+    var answer = btn.nextElementSibling;
+    var icon   = btn.querySelector('.fa');
+    var isOpen = answer.style.display === 'block';
+    document.querySelectorAll('.faq-answer').forEach(function(a){ a.style.display='none'; });
+    document.querySelectorAll('.faq-item .fa').forEach(function(i){ i.className='fa fa-plus'; });
+    if (!isOpen) { answer.style.display='block'; icon.className='fa fa-minus'; }
+}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { ['modal-cara-belanja','modal-faq'].forEach(closeModal); }
+});
+</script>
 
 <!-- ============================================================
      JS FILES

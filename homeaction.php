@@ -42,7 +42,7 @@ if (isset($_POST['getProducthome'])) {
     $sql    = "SELECT p.*, c.cat_title, c.cat_name
                FROM product p
                LEFT JOIN category c ON p.product_cat = c.cat_id
-               ORDER BY p.product_id DESC LIMIT 9";
+               ORDER BY p.product_id DESC";
     $result = mysqli_query($con, $sql);
     renderAppleCards($result);
 }
@@ -56,12 +56,38 @@ if (isset($_POST['get_seleted_Category'])) {
         $sql = "SELECT p.*, c.cat_title, c.cat_name
                 FROM product p
                 LEFT JOIN category c ON p.product_cat = c.cat_id
-                ORDER BY p.product_id DESC LIMIT 9";
+                ORDER BY p.product_id DESC";
     } else {
         $sql = "SELECT p.*, c.cat_title, c.cat_name
                 FROM product p
                 LEFT JOIN category c ON p.product_cat = c.cat_id
-                WHERE p.product_cat = '$cat_id' LIMIT 9";
+                WHERE p.product_cat = '$cat_id'
+                ORDER BY p.product_id DESC";
+    }
+    $result = mysqli_query($con, $sql);
+    renderAppleCards($result);
+}
+
+// ============================================================
+//  SEARCH PRODUCTS (untuk homepage)
+// ============================================================
+if (isset($_POST['searchHome'])) {
+    $keyword = mysqli_real_escape_string($con, $_POST['keyword']);
+    $cat_id  = isset($_POST['cat_id']) ? (int)$_POST['cat_id'] : 0;
+
+    if ($cat_id > 0) {
+        $sql = "SELECT p.*, c.cat_title, c.cat_name
+                FROM product p
+                LEFT JOIN category c ON p.product_cat = c.cat_id
+                WHERE p.product_cat = '$cat_id'
+                  AND (p.product_title LIKE '%$keyword%' OR p.product_keywords LIKE '%$keyword%')
+                ORDER BY p.product_id DESC";
+    } else {
+        $sql = "SELECT p.*, c.cat_title, c.cat_name
+                FROM product p
+                LEFT JOIN category c ON p.product_cat = c.cat_id
+                WHERE p.product_title LIKE '%$keyword%' OR p.product_keywords LIKE '%$keyword%'
+                ORDER BY p.product_id DESC";
     }
     $result = mysqli_query($con, $sql);
     renderAppleCards($result);
@@ -105,7 +131,7 @@ function renderAppleCards($result) {
             $short_desc = !empty($desc) ? mb_substr($desc, 0, 80) . '...' : '';
 
             echo '
-            <div class="product-card fade-in" style="transition-delay:' . ($index * 0.08) . 's;">
+            <div class="product-card fade-in" style="transition-delay:' . min($index * 0.06, 0.5) . 's;">
                 ' . $badge_html . '
                 <div class="card-img">
                     <img src="' . $img . '"

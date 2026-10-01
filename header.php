@@ -151,7 +151,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 
             <!-- SEARCH BAR -->
             <div class="header-search" style="flex:1; max-width:420px; margin:0 24px;">
-                <form onsubmit="return false;">
+                <form id="search-form" onsubmit="doSearch(); return false;">
                     <i class="fa fa-search" style="color:var(--text-secondary); font-size:14px;"></i>
                     <select class="input-select" id="search-category">
                         <option value="0">Semua</option>

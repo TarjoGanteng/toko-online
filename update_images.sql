@@ -22,3 +22,7 @@ UPDATE product SET product_image = 'Kemeja-Wanita-Oxford-Uniqlo.jpg' WHERE produ
 UPDATE product SET product_image = 'Tunik-Batik-Modern.jpg'       WHERE product_title LIKE '%Tunik Batik%';
 UPDATE product SET product_image = 'Celana-Jogger-Training-Adidas.avif' WHERE product_title LIKE '%Jogger Training Adidas%';
 
+-- Tambahan baru
+UPDATE product SET product_image = 'Apple Watch Series 9.jpg'       WHERE product_title LIKE '%Apple Watch Series 9%';
+UPDATE product SET product_image = 'Xiaomi Redmi Note 12 Pro.jpg'   WHERE product_title LIKE '%Xiaomi Redmi Note 12 Pro%';
+UPDATE product SET product_image = 'Xiaomi Smart TV 55 4K.jpg'      WHERE product_title LIKE '%Xiaomi Smart TV 55%';

@@ -59,9 +59,12 @@
         <div id="stacked-view" class="stacked-categories">
             <?php
             $stack_cats = [
-                ['id'=>1, 'name'=>'Elektronik',  'icon'=>'fa-laptop',        'accent'=>'#0071e3', 'grad'=>'linear-gradient(135deg,#0a1f44,#0071e3)', 'light'=>'#deeeff'],
-                ['id'=>2, 'name'=>'Ladies Wear', 'icon'=>'fa-star',          'accent'=>'#d63384', 'grad'=>'linear-gradient(135deg,#6f1d3e,#d63384)', 'light'=>'#ffe0ef'],
-                ['id'=>3, 'name'=>'Mens Wear',   'icon'=>'fa-shield',        'accent'=>'#5856d6', 'grad'=>'linear-gradient(135deg,#1a1355,#5856d6)', 'light'=>'#e8e6ff'],
+                ['id'=>1, 'name'=>'Elektronik',    'icon'=>'fa-laptop',       'accent'=>'#0071e3', 'grad'=>'linear-gradient(135deg,#0a1f44,#0071e3)', 'light'=>'#deeeff'],
+                ['id'=>2, 'name'=>'Ladies Wear',   'icon'=>'fa-star',         'accent'=>'#d63384', 'grad'=>'linear-gradient(135deg,#6f1d3e,#d63384)', 'light'=>'#ffe0ef'],
+                ['id'=>3, 'name'=>'Mens Wear',     'icon'=>'fa-shield',       'accent'=>'#5856d6', 'grad'=>'linear-gradient(135deg,#1a1355,#5856d6)', 'light'=>'#e8e6ff'],
+                ['id'=>4, 'name'=>'Olahraga',      'icon'=>'fa-futbol-o',     'accent'=>'#30b650', 'grad'=>'linear-gradient(135deg,#0a3d1f,#30b650)', 'light'=>'#d6f5e0'],
+                ['id'=>5, 'name'=>'Rumah & Dapur', 'icon'=>'fa-home',         'accent'=>'#e07c00', 'grad'=>'linear-gradient(135deg,#5c2e00,#e07c00)', 'light'=>'#ffecd1'],
+                ['id'=>6, 'name'=>'Buku',          'icon'=>'fa-book',         'accent'=>'#9b59b6', 'grad'=>'linear-gradient(135deg,#3b1160,#9b59b6)', 'light'=>'#f0e0ff'],
             ];
             foreach ($stack_cats as $cat):
                 // Top product
@@ -175,7 +178,7 @@
                 <h3>Elektronik</h3>
                 <p>Smartphone, laptop, TV, headphone, dan gadget terbaru dari brand ternama dunia.</p>
                 <a href="#new-arrivals" class="btn-outline" style="color:#64d2ff; margin-top:20px; display:inline-flex;"
-                   onclick="event.preventDefault(); filterProductsByCategory(1);">
+                   onclick="event.preventDefault(); loadCategoryStack(1,'Elektronik');">
                     Lihat Produk
                 </a>
             </div>
@@ -187,7 +190,7 @@
                 <h3>Fashion</h3>
                 <p>Koleksi pakaian pria dan wanita dari brand internasional Zara, H&M, Uniqlo, dan lainnya.</p>
                 <a href="#new-arrivals" class="btn-outline" style="color:#64d2ff; margin-top:20px; display:inline-flex;"
-                   onclick="event.preventDefault(); filterProductsByCategory(2);">
+                   onclick="event.preventDefault(); loadCategoryStack(2,'Ladies Wear');">
                     Lihat Produk
                 </a>
             </div>
@@ -199,7 +202,31 @@
                 <h3>Olahraga</h3>
                 <p>Sepatu, pakaian, dan perlengkapan olahraga Nike, Adidas untuk performa terbaik Anda.</p>
                 <a href="#new-arrivals" class="btn-outline" style="color:#64d2ff; margin-top:20px; display:inline-flex;"
-                   onclick="event.preventDefault(); filterProductsByCategory(4);">
+                   onclick="event.preventDefault(); loadCategoryStack(4,'Olahraga');">
+                    Lihat Produk
+                </a>
+            </div>
+
+            <div class="featured-card fade-in fade-in-delay-1">
+                <div class="icon">
+                    <i class="fa fa-home fa-2x" style="color:#64d2ff;"></i>
+                </div>
+                <h3>Rumah &amp; Dapur</h3>
+                <p>Furnitur, peralatan dapur, dan dekorasi rumah berkualitas untuk hunian idaman Anda.</p>
+                <a href="#new-arrivals" class="btn-outline" style="color:#64d2ff; margin-top:20px; display:inline-flex;"
+                   onclick="event.preventDefault(); loadCategoryStack(5,'Rumah & Dapur');">
+                    Lihat Produk
+                </a>
+            </div>
+
+            <div class="featured-card fade-in fade-in-delay-2">
+                <div class="icon">
+                    <i class="fa fa-book fa-2x" style="color:#64d2ff;"></i>
+                </div>
+                <h3>Buku</h3>
+                <p>Koleksi buku terlengkap — fiksi, non-fiksi, pemrograman, bisnis, hingga self-development.</p>
+                <a href="#new-arrivals" class="btn-outline" style="color:#64d2ff; margin-top:20px; display:inline-flex;"
+                   onclick="event.preventDefault(); loadCategoryStack(6,'Buku');">
                     Lihat Produk
                 </a>
             </div>
